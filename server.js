@@ -11,17 +11,15 @@ mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true, useUnifiedTopolo
 // parse application/x-www-form-urlencoded parser
 app.use(bodyParser.urlencoded({ extended: false }));
 
-const schema = new mongoose.Schema({
-  username: String,
-  exercise:[{
-    description: String,
-    duration: Number,
-    date: Date
-  }]
+const personSchema = new mongoose.Schema({
+  username: String
 });
-const User = mongoose.model('User',schema);
+const User = mongoose.model('User',personSchema);
 
+const exerciseSchema = new mongoose.Schema({userId:String, description: String, duration: Number, date: Date})
+const Exercise = mongoose.model('Exercise',exerciseSchema)
 app.use(cors())
+
 app.use(express.static('public'))
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
@@ -45,14 +43,19 @@ app.route('/api/users').post((req,res)=>{
 });
 
 app.route('/api/users/:_id/exercises').post((req,res)=>{
-    var exerciset={"description":req.body.description,"duration":req.body.duration,"date":req.body.date};
-    User.find({"id":req.body._id},(err,data)=>{
-      if (err) return done (err);
-      data.exercise.push(exerciset);
-      data.save((err,data)=>{
-        if(err) return done (err);
-        res.json({"_id":data.id,"username":data.username,"date":req.bod.date,"duration":req.body.duration,"description":req.body.description});
-      });
+    const{userId,description,duration,date} = req.body;
+
+    User.findById(userId, (err,data)=>{
+      if(!data){
+        res.send("Unknown userId")
+      }
+      else{
+        const user = data.username
+        const newExercise = new Exercise({userId, description, duration, date})
+        newExercise.save((err,data)=>{
+          res.json({userId, user, description, duration, date})
+        })
+      }
     })
 
 })
