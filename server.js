@@ -43,23 +43,22 @@ app.route('/api/users').post((req,res)=>{
 });
 
 app.route('/api/users/:_id/exercises').post((req,res)=>{
-    const{userId,description,duration,date} = req.body;
+  const{userId,description,duration,date} = req.body;
 
-    User.findById(userId, (err,data)=>{
-      if(!data){
-        res.send("Unknown userId")
-      }
-      else{
-        const user = data.username
-        const newExercise = new Exercise({userId, description, duration, date})
-        newExercise.save((err,data)=>{
-          res.json({userId, user, description, duration, date})
-        })
-      }
-    })
-
-})
+  User.findById(userId, (err,data)=>{
+    if(!data){
+      res.send("Unknown userId")
+    }
+    else{
+      const user = data.username
+      const newExercise = new Exercise({userId, description, duration, date})
+      newExercise.save((err,data)=>{
+        res.json({userId, user, description, duration, date})
+      })
+    }
+  });
+});
 
 const listener = app.listen(process.env.PORT || 3000, () => {
-  console.log('Your app is listening on port ' + listener.address().port)
+  console.log('Your app is listening on port ' + listener.address().port);
 })
