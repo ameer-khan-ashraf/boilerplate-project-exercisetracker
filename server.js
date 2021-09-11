@@ -12,7 +12,7 @@ mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true, useUnifiedTopolo
 app.use(bodyParser.urlencoded({ extended: false }));
 
 const personSchema = new mongoose.Schema({
-  username: String
+  username: {type:String, unique: true}
 });
 const User = mongoose.model('User',personSchema);
 
@@ -28,8 +28,12 @@ app.get('/', (req, res) => {
 app.route('/api/users').post((req,res)=>{
     const user = new User({username:req.body.username});
     user.save((err,data)=>{
-      if(err) return done (err);
-      res.json({"username":data.username, "_id":data.id});
+      if(err){
+        res.json("username already taken");
+      }
+      else{
+        res.json({"username":data.username, "_id":data.id});
+      }
     })
 }).get((req,res)=>{
   User.find({}, (err,data)=>{
@@ -53,7 +57,7 @@ app.route('/api/users/:_id/exercises').post((req,res)=>{
       const user = data.username
       const newExercise = new Exercise({userId, description, duration, date})
       newExercise.save((err,data)=>{
-        dateres =moment(data.date).format("ddd MMM DD YYYY");
+        dateres =new Date(data.date).toDateString();
         console.log(data);
         res.json({"_id":data.userId,
                   "username":user, 
@@ -64,7 +68,10 @@ app.route('/api/users/:_id/exercises').post((req,res)=>{
     }
   });
 });
-
+app.route('/api/users/:_id/logs').get((req,res)=>{
+  const userId = req.params._id;
+  const{from,to,limit} = req.query;
+});
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port);
 })
