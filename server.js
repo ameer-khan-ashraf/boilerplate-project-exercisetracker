@@ -29,7 +29,7 @@ app.route('/api/users').post((req,res)=>{
     const user = new User({username:req.body.username});
     user.save((err,data)=>{
       if(err) return done (err);
-      res.json({"user":data.username, "id":data.id});
+      res.json({"username":data.username, "_id":data.id});
     })
 }).get((req,res)=>{
   User.find({}, (err,data)=>{
