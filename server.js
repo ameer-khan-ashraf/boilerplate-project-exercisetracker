@@ -35,7 +35,7 @@ app.route('/api/users').post((req,res)=>{
   User.find({}, (err,data)=>{
     usermap=[]
     data.forEach(function(data){
-      userdetails={"id":data.id,"username":data.username};
+      userdetails={"username":data.username,"_id":data.id};
       usermap.push(userdetails);
     })
     res.json(usermap)
