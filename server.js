@@ -44,8 +44,7 @@ app.route('/api/users').post((req,res)=>{
 
 app.route('/api/users/:_id/exercises').post((req,res)=>{
   let{userId,description,duration,date} = req.body;
-  date = date?moment(date).format("MMM Do YY"):moment().format("MMM Do YY");
-  console.log(date)
+  date = date?date:moment().format("MMM DD YY");
   User.findById(userId, (err,data)=>{
     if(!data){
       res.send("Unknown userId")
@@ -54,8 +53,13 @@ app.route('/api/users/:_id/exercises').post((req,res)=>{
       const user = data.username
       const newExercise = new Exercise({userId, description, duration, date})
       newExercise.save((err,data)=>{
-        res.json({"_id":userId,
-                  "username":user, date,duration,description })
+        dateres =moment(data.date).format("MMM DD YYYY");
+        console.log(data);
+        res.json({"_id":data.userId,
+                  "username":user, 
+                  "date":dateres,
+                  "duration":data.duration,
+                  "description":data.description })
       })
     }
   });
