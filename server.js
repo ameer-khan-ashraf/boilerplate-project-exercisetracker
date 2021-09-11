@@ -4,7 +4,7 @@ const cors = require('cors')
 const mongoose = require('mongoose')
 require('dotenv').config()
 var bodyParser = require('body-parser');
-
+var moment = require('moment');
 //Mongoose Connection
 mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true, useUnifiedTopology: true});
 
@@ -43,8 +43,9 @@ app.route('/api/users').post((req,res)=>{
 });
 
 app.route('/api/users/:_id/exercises').post((req,res)=>{
-  const{userId,description,duration,date} = req.body;
-
+  let{userId,description,duration,date} = req.body;
+  date = date?moment(date).format("MMM Do YY"):moment().format("MMM Do YY");
+  console.log(date)
   User.findById(userId, (err,data)=>{
     if(!data){
       res.send("Unknown userId")
