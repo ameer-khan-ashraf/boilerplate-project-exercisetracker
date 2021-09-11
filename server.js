@@ -58,11 +58,12 @@ app.route('/api/users/:_id/exercises').post((req,res)=>{
       const user = data.username
       const newExercise = new Exercise({userId, description, duration, date})
       newExercise.save((err,data)=>{
-        res.json({"_id":userId,
-                  "username":user, 
-                  "date":date,
+        res.json({"username":user,
+                  "description":description,
                   "duration": +duration,
-                  "description":description })
+                  "date":date,
+                  "_id":userId
+                   })
       })
     }
   });
