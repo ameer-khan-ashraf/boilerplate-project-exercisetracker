@@ -47,8 +47,10 @@ app.route('/api/users').post((req,res)=>{
 });
 
 app.route('/api/users/:_id/exercises').post((req,res)=>{
-  let{userId,description,duration,date} = req.body;
-  date = date?date: Date.now();
+  const userId = req.params._id;
+  const description = req.body.description;
+  const duration = req.body.duration;
+  date = req.body.date?req.body.date: Date.now();
   date = new Date(date).toDateString();
   User.findById(userId, (err,data)=>{
     if(!data){
@@ -57,11 +59,11 @@ app.route('/api/users/:_id/exercises').post((req,res)=>{
     else{
       const user = data.username
       const newExercise = new Exercise({userId, description, duration, date})
-      newExercise.save((err,data)=>{
+      newExercise.save((err,resp)=>{
         res.json({"_id":userId,
                   "username":user, 
                   "date":date,
-                  "duration": +duration,
+                  "duration": Number(duration),
                   "description":description })
       })
     }
