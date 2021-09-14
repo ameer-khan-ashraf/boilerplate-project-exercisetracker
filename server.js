@@ -71,7 +71,33 @@ app.route('/api/users/:_id/exercises').post((req,res)=>{
 });
 app.route('/api/users/:_id/logs').get((req,res)=>{
   const userId = req.params._id;
-  const{from,to,limit} = req.query;
+  let{from,to,limit} = req.query;
+
+  User.find({_id:userId},(err, docs)=>{
+    if(!docs){
+      res.send("no user found");
+    }
+    else{
+      console.log(docs[0]._id,docs[0].username);
+      console.log("user found");
+      Exercise.find({userId:userId,date:{$gte:from?from:new Date(-8640000000000000), $lte:to?to:new Date(8640000000000000)}}).limit(limit?Number(limit):1000).then((resp)=>{
+          const count = resp.length;
+          resp=JSON.parse(JSON.stringify(resp));
+          console.log("this is the response",count,resp);
+          for (var i=0;i<count;i++){
+            resp[i].date = new Date(resp[i].date).toDateString();
+            console.log(resp[i].date);
+          }
+          res.json({
+            "username": docs[0].username,
+            "count": count,
+            "_id": userId,
+            "log":resp
+          })
+
+      });
+    }
+  })
 });
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port);
